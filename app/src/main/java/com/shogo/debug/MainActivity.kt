@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -22,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         val binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
 
         val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-            .setLink(Uri.parse("https://shogogeek.com/test"))
+            .setLink(Uri.parse("https://shogogeek.com/test?id=test"))
             .setDomainUriPrefix("https://shogogeek.com")
             .setAndroidParameters(DynamicLink.AndroidParameters.Builder().build())
             .setIosParameters(DynamicLink.IosParameters.Builder("com.example.ios").build())
@@ -38,5 +39,25 @@ class MainActivity : AppCompatActivity() {
             mManager.setPrimaryClip(ClipData.newPlainText("", dynamicLinkUri.toString()))
             Toast.makeText(this, "クリップボードにコピーしました", Toast.LENGTH_LONG).show()
         }
+
+        FirebaseDynamicLinks.getInstance()
+            .getDynamicLink(intent)
+            .addOnSuccessListener(
+                this
+            ) { pendingDynamicLinkData ->
+                var deepLink: Uri? = null
+                if (pendingDynamicLinkData != null) {
+                    deepLink = pendingDynamicLinkData.link
+                }
+                val id = deepLink?.getQueryParameter("id")
+                if (id == null || id == "") {
+                    binding.id.text = "現在IDは空です。"
+                }else {
+                    binding.id.text = "id=$id"
+                }
+            }
+            .addOnFailureListener(
+                this
+            ) { e -> Log.w("ダイナミックリンクのエラー", "getDynamicLink:onFailure", e) }
     }
 }

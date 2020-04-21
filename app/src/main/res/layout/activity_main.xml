@@ -28,8 +28,21 @@
             app:layout_constraintTop_toBottomOf="@+id/generate"
             android:clickable="true"
             android:focusable="true"
-            android:visibility="gone"
+            tools:visibility="visible"
             tools:text="生成されたURL" />
+
+        <TextView
+            android:id="@+id/id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/generated_url"
+            android:clickable="true"
+            android:focusable="true"
+            tools:visibility="visible"
+            tools:text="id=2" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
