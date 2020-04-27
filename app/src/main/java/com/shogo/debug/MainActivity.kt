@@ -20,25 +20,28 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
+        val binding =
+            DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
 
         val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-            .setLink(Uri.parse("https://shogogeek.com/test?id=test"))
             .setDomainUriPrefix("https://shogogeek.com")
-            .setAndroidParameters(DynamicLink.AndroidParameters.Builder().build())
-            .setIosParameters(DynamicLink.IosParameters.Builder("com.example.ios").build())
-            .buildDynamicLink()
+            .setLongLink(Uri.parse("https://shogogeek.com/?link=https://zozo.jp/shop/classicalelf/goods/35056123&apn=com.shogo.debug&afl=https://note.com&ibi=com.example.test&st=title&si=https://firebasestorage.googleapis.com/v0/b/retory-debug.appspot.com/o/shareImage%2FApple000699.e2b04d396f774c878e6e5767525ccfa4.0211%2F2020-04-18%2021%3A22%3A59.909721.png?alt=media&token=42b3d531-9a2e-4a4c-96ee-872438ab2cf1&sd=detail"))
+            .buildShortDynamicLink()
+            .addOnSuccessListener { result ->
+                // Short link created
+                val shortLink = result.shortLink
+                val flowchartLink = result.previewLink
 
-        val dynamicLinkUri = dynamicLink.uri
+                binding.generatedUrl.visibility = View.VISIBLE
+                binding.generatedUrl.text = flowchartLink.toString()
 
-        binding.generatedUrl.visibility = View.VISIBLE
-        binding.generatedUrl.text = dynamicLinkUri.toString()
-
-        val mManager: ClipboardManager = applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        binding.generatedUrl.setOnClickListener {
-            mManager.setPrimaryClip(ClipData.newPlainText("", dynamicLinkUri.toString()))
-            Toast.makeText(this, "クリップボードにコピーしました", Toast.LENGTH_LONG).show()
-        }
+                val mManager: ClipboardManager =
+                    applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                binding.generatedUrl.setOnClickListener {
+                    mManager.setPrimaryClip(ClipData.newPlainText("", shortLink.toString()))
+                    Toast.makeText(this, "クリップボードにコピーしました", Toast.LENGTH_LONG).show()
+                }
+            }
 
         FirebaseDynamicLinks.getInstance()
             .getDynamicLink(intent)
@@ -52,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                 val id = deepLink?.getQueryParameter("id")
                 if (id == null || id == "") {
                     binding.id.text = "現在IDは空です。"
-                }else {
+                } else {
                     binding.id.text = "id=$id"
                 }
             }
